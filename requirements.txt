@@ -1,0 +1,58 @@
+# -------------------------
+# Core Python utilities
+# -------------------------
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+
+# -------------------------
+# Image and PDF processing
+# -------------------------
+Pillow==10.3.0
+pdf2image==1.17.0
+opencv-python-headless==4.10.0.84
+
+# -------------------------
+# Deep Learning / NLP / Embeddings
+# -------------------------
+torch>=2.2.0
+sentence-transformers>=2.7.0
+transformers>=4.41.2
+rapidfuzz>=3.9.3
+
+# -------------------------
+# Google Cloud SDKs
+# -------------------------
+google-cloud-storage==2.18.2
+google-cloud-aiplatform>=1.71.1
+google-genai>=1.0.0
+langchain_google_vertexai>=1.0.0
+
+# -------------------------
+# Parallelism and Logging
+# -------------------------
+concurrent-log-handler==0.9.24
+tqdm>=4.66.2
+
+# -------------------------
+# Excel / Report generation
+# -------------------------
+openpyxl>=3.1.3
+xlsxwriter>=3.2.0
+
+# -------------------------
+# Compatibility Fixes (IMPORTANT)
+# -------------------------
+protobuf==4.25.3  # Prevents 'MessageFactory.GetPrototype' AttributeError
+
+# -------------------------
+# Optional Visualization / Utilities
+# -------------------------
+matplotlib>=3.9.0
+seaborn>=0.13.2
+
+# -------------------------
+# TensorFlow (optional — only if YOLO or TF-based models are used)
+# -------------------------
+tensorflow==2.17.0   # ✅ fixed to match tf-keras>=2.17.0 requirements
+tf-keras==2.17.0     # ensure compatibility between TensorFlow and tf-keras
