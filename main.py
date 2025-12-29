@@ -1,3 +1,4 @@
+python -m pip install --upgrade pip
 import os
 os.system("pip install opencv-python-headless")
 from objectdetection import PDFProcessingPipeline
