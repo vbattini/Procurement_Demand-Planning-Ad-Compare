@@ -1,4 +1,6 @@
 import streamlit as st
+import subprocess
+import sys
 import os
 
 st.set_page_config(page_title="Ad Compare Pipeline", layout="centered")
@@ -23,7 +25,7 @@ uploaded_excel = st.file_uploader(
     type=["xlsx"]
 )
 
-run = st.button("🚀 Submit Files")
+run = st.button("🚀 Run Pipeline")
 
 # -------------------------
 # Save files locally
@@ -31,37 +33,42 @@ run = st.button("🚀 Submit Files")
 if uploaded_pdf:
     with open(uploaded_pdf.name, "wb") as f:
         f.write(uploaded_pdf.getbuffer())
-    st.success("📄 PDF uploaded successfully")
+    st.success("PDF uploaded successfully")
 
 if uploaded_excel:
     with open(uploaded_excel.name, "wb") as f:
         f.write(uploaded_excel.getbuffer())
-    st.success("📊 Excel uploaded successfully")
+    st.success("Excel uploaded successfully")
 
 # -------------------------
-# UI-ONLY action
+# Run pipeline via subprocess
 # -------------------------
 if run:
     if not uploaded_pdf or not uploaded_excel:
-        st.error("❌ Please upload both PDF and Excel files")
+        st.error("Please upload both PDF and Excel files")
     else:
-        st.success("✅ Files received successfully")
-        st.info(
-            """
-            🔧 **Pipeline Execution Notice**
+        try:
+            with st.spinner("Running pipeline..."):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        "main.py",
+                        bucket,
+                        uploaded_pdf.name,
+                        uploaded_excel.name
+                    ],
+                    capture_output=True,
+                    text=True
+                )
 
-            The ML pipeline runs in a separate backend environment
-            (Local / VM / GCP / Colab).
+            if result.returncode == 0:
+                st.success("✅ Pipeline completed successfully")
+                if result.stdout:
+                    st.text(result.stdout)
+            else:
+                st.error("❌ Pipeline failed")
+                if result.stderr:
+                    st.text(result.stderr)
 
-            This Streamlit app is used for:
-            • Uploading inputs  
-            • Validating files  
-            • Triggering backend jobs (future)  
-            • Viewing results  
-
-            Please run the pipeline using:
-            ```
-            python main.py <bucket> <pdf> <excel>
-            ```
-            """
-        )
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
