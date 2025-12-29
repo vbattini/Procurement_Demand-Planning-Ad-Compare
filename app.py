@@ -1,6 +1,4 @@
 import streamlit as st
-import subprocess
-import sys
 import os
 
 st.set_page_config(page_title="Ad Compare Pipeline", layout="centered")
@@ -25,7 +23,7 @@ uploaded_excel = st.file_uploader(
     type=["xlsx"]
 )
 
-run = st.button("🚀 Run Pipeline")
+run = st.button("🚀 Submit Files")
 
 # -------------------------
 # Save files locally
@@ -33,42 +31,37 @@ run = st.button("🚀 Run Pipeline")
 if uploaded_pdf:
     with open(uploaded_pdf.name, "wb") as f:
         f.write(uploaded_pdf.getbuffer())
-    st.success("PDF uploaded successfully")
+    st.success("📄 PDF uploaded successfully")
 
 if uploaded_excel:
     with open(uploaded_excel.name, "wb") as f:
         f.write(uploaded_excel.getbuffer())
-    st.success("Excel uploaded successfully")
+    st.success("📊 Excel uploaded successfully")
 
 # -------------------------
-# Run pipeline via subprocess
+# UI-ONLY action
 # -------------------------
 if run:
     if not uploaded_pdf or not uploaded_excel:
-        st.error("Please upload both PDF and Excel files")
+        st.error("❌ Please upload both PDF and Excel files")
     else:
-        try:
-            with st.spinner("Running pipeline..."):
-                result = subprocess.run(
-                    [
-                        sys.executable,
-                        "main.py",
-                        bucket,
-                        uploaded_pdf.name,
-                        uploaded_excel.name
-                    ],
-                    capture_output=True,
-                    text=True
-                )
+        st.success("✅ Files received successfully")
+        st.info(
+            """
+            🔧 **Pipeline Execution Notice**
 
-            if result.returncode == 0:
-                st.success("✅ Pipeline completed successfully")
-                if result.stdout:
-                    st.text(result.stdout)
-            else:
-                st.error("❌ Pipeline failed")
-                if result.stderr:
-                    st.text(result.stderr)
+            The ML pipeline runs in a separate backend environment
+            (Local / VM / GCP / Colab).
 
-        except Exception as e:
-            st.error(f"❌ Error: {e}")
+            This Streamlit app is used for:
+            • Uploading inputs  
+            • Validating files  
+            • Triggering backend jobs (future)  
+            • Viewing results  
+
+            Please run the pipeline using:
+            ```
+            python main.py <bucket> <pdf> <excel>
+            ```
+            """
+        )
