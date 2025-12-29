@@ -5,6 +5,8 @@ from textcomparison_llm import LLMSimilarityComponent
 from textcomparison_finalresults import FinalMatchComponent
 
 import time
+import os
+os.system("pip install opencv-python-headless")
 
 
 def main():
