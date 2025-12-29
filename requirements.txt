@@ -1,38 +1,38 @@
 # -------------------------
-# Core Python utilities
+# Core Python utilities (ALLOW WHEELS)
 # -------------------------
-numpy==1.26.4
-pandas==2.2.2
-scipy==1.13.1
+numpy>=1.26,<2.0
+pandas>=2.1,<2.3
+scipy>=1.11,<1.14
 
 # -------------------------
 # Image and PDF processing
 # -------------------------
-Pillow==10.3.0
-pdf2image==1.17.0
-opencv-python-headless==4.10.0.84
+Pillow>=10.0,<11
+pdf2image>=1.17.0
+opencv-python-headless>=4.9,<4.11
 
 # -------------------------
 # Deep Learning / NLP / Embeddings
 # -------------------------
 torch>=2.2.0
 sentence-transformers>=2.7.0
-transformers>=4.41.2
-rapidfuzz>=3.9.3
+transformers>=4.41.0
+rapidfuzz>=3.9.0
 
 # -------------------------
 # Google Cloud SDKs
 # -------------------------
-google-cloud-storage==2.18.2
-google-cloud-aiplatform>=1.71.1
+google-cloud-storage>=2.18.0
+google-cloud-aiplatform>=1.71.0
 google-genai>=1.0.0
 langchain_google_vertexai>=1.0.0
 
 # -------------------------
 # Parallelism and Logging
 # -------------------------
-concurrent-log-handler==0.9.24
-tqdm>=4.66.2
+concurrent-log-handler>=0.9.24
+tqdm>=4.66.0
 
 # -------------------------
 # Excel / Report generation
@@ -43,16 +43,10 @@ xlsxwriter>=3.2.0
 # -------------------------
 # Compatibility Fixes
 # -------------------------
-protobuf==4.25.3
+protobuf>=4.25,<5
 
 # -------------------------
-# Optional Visualization
-# -------------------------
-matplotlib>=3.9.0
-seaborn>=0.13.2
-
-# -------------------------
-# TensorFlow (Streamlit Cloud compatible)
+# TensorFlow (STREAMLIT SAFE)
 # -------------------------
 tensorflow==2.15.0
 tf-keras==2.15.0
