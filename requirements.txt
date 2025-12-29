@@ -56,3 +56,6 @@ seaborn>=0.13.2
 # -------------------------
 tensorflow==2.17.0   # ✅ fixed to match tf-keras>=2.17.0 requirements
 tf-keras==2.17.0     # ensure compatibility between TensorFlow and tf-keras
+
+streamlit
+
