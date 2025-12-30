@@ -1,3 +1,7 @@
+import sys
+import streamlit as st
+st.write(sys.version)
+
 import streamlit as st
 from main import run_pipeline
 
