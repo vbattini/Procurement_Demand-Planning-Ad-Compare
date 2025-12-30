@@ -1,5 +1,4 @@
-import os
-os.system("pip install opencv-python-headless")
+
 from objectdetection import PDFProcessingPipeline
 from textextraction  import TextExtractionPipeline
 from textcomparison_nlp  import NLPMatchingComponent 
