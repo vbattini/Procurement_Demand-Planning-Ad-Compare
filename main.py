@@ -21,7 +21,7 @@ def main():
     print("🔹 Running Object Detection Pipeline...")
     start_time = time.time()
 
-    pdf_pipeline = PDFProcessingPipeline(bucket, input_pdf)
+    pdf_pipeline = PDFProcessingPipeline(bucket, input_pdf,verbose=False)
     pdf_pipeline.run()
 
     print(f"⏱ Object Detection Pipeline completed in {time.time() - start_time:.2f}s\n")
