@@ -1,5 +1,3 @@
-
-
 # pdf_processing_pipeline.py
 import os
 import io
@@ -18,7 +16,6 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from google.cloud import storage
 from ultralytics import YOLO
 
-
 import logging
 import os
 if os.system("which pdfinfo > /dev/null 2>&1") != 0:
@@ -34,10 +31,6 @@ logging.getLogger("ultralytics").setLevel(logging.ERROR)
 logging.getLogger("engine").setLevel(logging.ERROR)
 logging.getLogger("torch").setLevel(logging.ERROR)
 logging.getLogger().setLevel(logging.ERROR)
-
-
-
-
 
 class PDFProcessingPipeline:
     def __init__(self, gcs_bucket_name: str, input_pdf: str, pipeline_root_prefix: str = "DPAC/8.TestRun"):
@@ -253,7 +246,7 @@ class PDFProcessingPipeline:
                 continue
 
             filename = os.path.splitext(os.path.basename(image_path))[0]
-            crop_filename = f"{filename}_crop_{idx+1}_{uuid.uuid4().hex[:5]}.jpg"
+            crop_filename = f"{filename}_crop_{idx+1}.jpg"
             local_crop_path = os.path.join(self.LOCAL_CROP_DIR, crop_filename)
             os.makedirs(self.LOCAL_CROP_DIR, exist_ok=True)
             cv2.imwrite(local_crop_path, cropped)
@@ -326,29 +319,52 @@ class PDFProcessingPipeline:
         blobs = list(bucket.list_blobs(prefix=self.CROPPED_OBJECTS_PREFIX))
         with ThreadPoolExecutor(max_workers=self.MAX_WORKERS_NOISE) as executor:
             list(executor.map(lambda b: self.process_single_image_noise(bucket, b), blobs))
+    def clear_gcs_prefix(self, prefix: str, batch_size: int = 100, workers: int = 20):
+      """
+      Deletes BEFORE uploading new data.
+      """
+      client = self.init_gcs_client()
+      bucket = client.bucket(self.GCS_BUCKET_NAME)
+      blobs = list(bucket.list_blobs(prefix=prefix))
+      if not blobs:
+          self.log(f"ℹ️ No files to delete in {prefix}")
+          return
 
+      self.log(f"🧹 Deleting {len(blobs)} files from {prefix}")
+      def delete_batch(batch):
+          with client.batch():
+              for blob in batch:
+                  blob.delete()
+
+      batches = [
+          blobs[i:i + batch_size]
+          for i in range(0, len(blobs), batch_size)
+      ]
+      with ThreadPoolExecutor(max_workers=workers) as executor:
+          executor.map(delete_batch, batches)
+
+      self.log(f"✅ Cleared folder: {prefix}")
     # ----------------------------
     # Pipeline Orchestration
     # ----------------------------
     def run(self):
         pipeline_start = time.time()
-
         # self.log("Step 1: Verify GCS bucket...")
         self.verify_bucket()
-
+        #Delete immediately BEFORE writing to that folder:
+        self.clear_gcs_prefix(self.OUTPUT_IMAGES_PREFIX)
+        self.clear_gcs_prefix(self.PREDICTION_RESULTS_PREFIX)
+        self.clear_gcs_prefix(self.CROPPED_OBJECTS_PREFIX)
+        self.clear_gcs_prefix(self.CLEANED_IMAGES_PREFIX)
         pdf_files = self.list_pdfs(self.PDFS_INPUT_PREFIX)
         if pdf_files:
             self.log(f"Step 2: Found {len(pdf_files)} PDF(s) to convert.")
             for pdf_name in pdf_files:
                 self.process_pdf(pdf_name, self.OUTPUT_IMAGES_PREFIX)
-
         # self.log("Step 3: Running YOLO inference...")
         self.run_yolo_inference()
-
         # self.log("Step 4: Running object cropping...")
         self.run_object_cropping()
-
         # self.log("Step 5: Running noise filtering / image cleaning...")
         self.run_image_cleaning()
-
         self.log(f"🏁 Pipeline complete | Total time: {time.time() - pipeline_start:.2f}s")
